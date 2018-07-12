@@ -192,6 +192,7 @@ int main(int argc, char** argv)
         g.tm_hour = 0;
         g.tm_min = 0;
         g.tm_sec = 0;
+        g.tm_isdst = 0;
 
         t = mktime(&g);
     } else if (action.gregorian) {
