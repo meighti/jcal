@@ -71,6 +71,7 @@ int main(int argc, char** argv)
 
     struct jtm j;
     struct tm g;
+    char *tmp_tm_zone;
 
     struct jdate_action action = {0};
 
@@ -189,11 +190,19 @@ int main(int argc, char** argv)
             exit(EXIT_FAILURE);
         }
 
-        g.tm_hour = 0;
+        g.tm_hour = 12;
         g.tm_min = 0;
         g.tm_sec = 0;
+        g.tm_isdst = 0;
+        g.tm_gmtoff = 0;
+        tmp_tm_zone = getenv("TZ");
+        setenv("TZ", "UTC", 1);
 
         t = mktime(&g);
+        if (tmp_tm_zone)
+            setenv("TZ", tmp_tm_zone, 1);
+        else
+            unsetenv("TZ");
     } else if (action.gregorian) {
         if (!jstrptime(action.gregorian_ptr, "%Y/%m/%d", &j)) {
             fprintf(stderr, "Specify jalali date in the following format\n");
@@ -201,12 +210,20 @@ int main(int argc, char** argv)
             exit(EXIT_FAILURE);
         }
 
+        tmp_tm_zone = getenv("TZ");
+        setenv("TZ", "UTC", 1);
         jalali_update(&j);
-        j.tm_hour = 0;
+        j.tm_hour = 12;
         j.tm_min = 0;
         j.tm_sec = 0;
+        j.tm_isdst = 0;
+        j.tm_gmtoff = 0;
 
         t = jmktime(&j);
+        if (tmp_tm_zone)
+            setenv("TZ", tmp_tm_zone, 1);
+        else
+            unsetenv("TZ");
     }
 
     if (action.date) {
